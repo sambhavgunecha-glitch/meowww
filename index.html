@@ -2,98 +2,254 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>💖 A Question</title>
 
   <style>
+    /* -------- BODY / BACKGROUND -------- */
     body {
       margin: 0;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #ffc3a0);
+      background-size: 600% 600%;
+      animation: bgMove 18s ease infinite;
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
 
+    @keyframes bgMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* -------- CARD -------- */
     .card {
       background: white;
-      padding: 40px;
+      padding: 24px;
       border-radius: 20px;
       text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      width: 320px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      width: min(90vw, 340px);
+      position: relative;
+      z-index: 2;
+      animation: popIn 0.8s ease;
+      transition: transform 0.3s ease;
     }
 
-    h1 {
-      margin-bottom: 30px;
+    .card:hover {
+      transform: translateY(-6px);
     }
 
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* -------- BUTTONS -------- */
     button {
-      padding: 12px 20px;
-      font-size: 16px;
+      padding: 14px 26px;
+      font-size: 18px;
       border: none;
-      border-radius: 25px;
+      border-radius: 30px;
       cursor: pointer;
-      margin: 10px;
+      margin: 12px;
+      min-width: 120px;
     }
 
     #yes {
       background: #ff4d6d;
       color: white;
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,77,109,0.6); }
+      70% { box-shadow: 0 0 0 14px rgba(255,77,109,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,77,109,0); }
     }
 
     #no {
       background: #ccc;
       position: absolute;
     }
+
+    /* -------- FLOATING HEARTS -------- */
+    .heart {
+      position: fixed;
+      bottom: -20px;
+      font-size: 20px;
+      animation: floatUp linear forwards;
+      opacity: 0.7;
+      z-index: 1;
+    }
+
+    @keyframes floatUp {
+      to {
+        transform: translateY(-110vh);
+        opacity: 0;
+      }
+    }
+
+    /* -------- CONFETTI -------- */
+    .confetti {
+      position: fixed;
+      width: var(--size);
+      height: var(--size);
+      background: var(--color);
+      border-radius: var(--radius);
+      left: var(--start-x);
+      bottom: 0;
+      animation: burst 2.3s ease-out forwards;
+      z-index: 9999;
+    }
+
+    @keyframes burst {
+      to {
+        transform: translate(var(--x), var(--y)) rotate(var(--rot));
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 
 <body>
-
   <div class="card">
-    <div style="display:flex; gap:20px; margin:20px 0;">
-            <img src="please-cute.gif" width="220" alt="please-cute">
-          </div>
-          <h1>Will you be my Valentine? 💘</h1>
-    <button id="yes" onclick="yesClicked()">YES 😍</button>
+    <!-- Personal photo -->
+    <img src="us.jpg" style="border-radius:15px; margin-bottom:15px;">
+    <!-- Main question image -->
+    <img src="please-cute.gif" width="220">
+    <h1>Will you be my Valentine? 💘</h1>
+    <p style="font-size:14px; color:#555;">I’ve been meaning to ask you this for a while 🙂</p>
+
+    <button id="yes">YES 😍</button>
     <button id="no">NO 🙄</button>
   </div>
 
   <script>
     const noBtn = document.getElementById("no");
+    const yesBtn = document.getElementById("yes");
 
-    noBtn.addEventListener("mouseover", () => {
-      const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 100);
+    // NO button messages (inside jokes)
+    const noTexts = [
+      "NO 🙄",
+      "you serious?",
+      "Block Kardunga😭",
+      "Last chance!!",
+      "fine I’ll cry",
+      "Pleas Think again 😭😭"
+    ];
+    let noCount = 0;
+
+    // Function to change NO text
+    function changeNoText() {
+      noCount = (noCount + 1) % noTexts.length;
+      noBtn.textContent = noTexts[noCount];
+    }
+
+    // Trigger text change on hover, click, or touch
+    noBtn.addEventListener("mouseover", changeNoText);
+    noBtn.addEventListener("click", changeNoText);
+    noBtn.addEventListener("touchstart", changeNoText);
+
+    // Optional: move NO button slightly each time
+    function moveNo() {
+      const x = Math.random() * 220;
+      const y = Math.random() * 180;
       noBtn.style.left = x + "px";
       noBtn.style.top = y + "px";
+    }
+    noBtn.addEventListener("mouseover", moveNo);
+    noBtn.addEventListener("click", moveNo);
+    noBtn.addEventListener("touchstart", moveNo);
+
+    // YES button
+    yesBtn.addEventListener("click", () => {
+      launchCelebration();
+      setTimeout(() => {
+        document.body.innerHTML = `
+          <div style="
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            flex-direction:column;
+            padding:20px;
+            background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+            font-family:Arial;
+            text-align:center;
+          ">
+            <h1 style="font-size:clamp(24px,6vw,36px);">
+              YAYYYY!! I knew it 💖
+            </h1>
+
+            <img src="kiss-cute.gif" style="max-width:260px; margin:15px 0;">
+
+            <img src="us.jpg" style="
+              max-width:260px;
+              border-radius:16px;
+              margin-bottom:15px;
+            ">
+
+            <h2 style="font-size:clamp(16px,4.5vw,22px);">
+              and people say I don’t have rizz 😌
+            </h2>
+
+            <p style="font-size:14px; opacity:0.8;">
+              Screenshot this and let me know💕
+            </p>
+          </div>
+        `;
+      }, 1200);
     });
 
-    function yesClicked() {
-      document.body.innerHTML = `
-        <div style="
-          height:100vh;
-          display:flex;
-          justify-content:center;
-          align-items:center;
-          flex-direction:column;
-          background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-          font-family:Arial;
-          text-align:center;
-        ">
-          <h1>YAYYYY!! i knew it 💖</h1>
+    // Confetti function
+    function launchCelebration() {
+      const count = window.innerWidth < 600 ? 220 : 350;
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement("div");
+        c.className = "confetti";
 
-          <div style="display:flex; gap:20px; margin:20px 0;">
-            <img src="kiss-cute.gif" width="180" alt="Cute bears kissing">
-          </div>
+        const size = Math.random() * 22 + 8;
+        const angle = Math.random() * 140 - 70;
+        const distance = Math.random() * 420 + 320;
 
-          <h2>Then people say i dont have rizz</h2>
-        </div>
-      `;
+        c.style.setProperty("--size", size + "px");
+        c.style.setProperty("--radius", Math.random() > 0.5 ? "50%" : "3px");
+        c.style.setProperty("--color",
+          ["#ff4d6d", "#ffd166", "#cdb4db", "#a2d2ff", "#ffafcc"]
+          [Math.floor(Math.random() * 5)]
+        );
+
+        c.style.setProperty("--start-x", Math.random() * 100 + "vw");
+        c.style.setProperty("--x", Math.cos(angle * Math.PI / 180) * distance + "px");
+        c.style.setProperty("--y", -Math.sin(angle * Math.PI / 180) * distance + "px");
+        c.style.setProperty("--rot", Math.random() * 1080 + "deg");
+
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 2300);
+      }
     }
-  </script>
 
+    // Floating hearts loop
+    setInterval(() => {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = Math.random() > 0.5 ? "💖" : "💘";
+      h.style.left = Math.random() * 100 + "vw";
+      h.style.fontSize = (Math.random()*14 + 16) + "px";
+      h.style.animationDuration = Math.random() * 6 + 6 + "s";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 12000);
+    }, 800);
+  </script>
 </body>
 </html>
